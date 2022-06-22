@@ -51,9 +51,9 @@ async def init():
     async def mode_func(_, message: Message):
         if db is None:
             return await message.reply_text(
-                "MONGO_DB_URI var not defined. Please define it first"
+                "MONGO_DB_URI var không được xác định.  Hãy xác định nó trước"
             )
-        usage = "**Usage:**\n\n/mode [group | private]\n\n**Group**: All the incoming messages will be forwarded to Log group.\n\n**Private**: All the incoming messages will be forwarded to the Private Messages of SUDO_USERS"
+        usage = "**Sử dụng:**\n\n/mode [group | private]\n\n**group**: Tất cả các tin nhắn đến sẽ được chuyển tiếp đến nhóm Nhật ký.\n\n**private**: Tất cả các tin nhắn đến sẽ được chuyển tiếp đến Tin nhắn riêng tư của quản trị viên."
         if len(message.command) != 2:
             return await message.reply_text(usage)
         state = message.text.split(None, 1)[1].strip()
@@ -61,12 +61,12 @@ async def init():
         if state == "group":
             await mongo.group_on()
             await message.reply_text(
-                "Group Mode Enabled. All the incoming messages will be forwarded to LOG Group"
+                "Chế độ nhóm được bật. Tất cả các tin nhắn đến sẽ được chuyển tiếp đến LOG Group"
             )
         elif state == "private":
             await mongo.group_off()
             await message.reply_text(
-                "Private Mode Enabled. All the incoming messages will be forwarded to Private Message of all SUDO_USERs"
+                "Đã bật Chế độ Riêng tư. Tất cả các tin nhắn đến sẽ được chuyển tiếp đến Tin nhắn riêng của quản trị viên!"
             )
         else:
             await message.reply_text(usage)
@@ -77,12 +77,12 @@ async def init():
     async def block_func(_, message: Message):
         if db is None:
             return await message.reply_text(
-                "MONGO_DB_URI var not defined. Please define it first"
+                "MONGO_DB_URI var không được xác định.  Hãy xác định nó trước"
             )
         if message.reply_to_message:
             if not message.reply_to_message.forward_sender_name:
                 return await message.reply_text(
-                    "Please reply to forwarded messages only."
+                    "Vui lòng chỉ trả lời các tin nhắn được chuyển tiếp."
                 )
             replied_id = message.reply_to_message_id
             try:
@@ -90,23 +90,23 @@ async def init():
             except Exception as e:
                 print(e)
                 return await message.reply_text(
-                    "Failed to fetch user. You might've restarted bot or some error happened. Please check logs"
+                    "Không tìm nạp được người dùng. Bạn có thể đã khởi động lại bot hoặc một số lỗi đã xảy ra.  Vui lòng kiểm tra nhật ký"
                 )
             if await mongo.is_banned_user(replied_user_id):
-                return await message.reply_text("Already Blocked")
+                return await message.reply_text("Đã bị chặn")
             else:
                 await mongo.add_banned_user(replied_user_id)
-                await message.reply_text("Banned User from The Bot")
+                await message.reply_text("Cấm người dùng khởi động Bot")
                 try:
                     await app.send_message(
                         replied_user_id,
-                        "You're now banned from using the Bot by admins.",
+                        "Bạn hiện bị quản trị viên cấm sử dụng Bot.",
                     )
                 except:
                     pass
         else:
             return await message.reply_text(
-                "Reply to a user's forwarded message to block him from using the bot"
+                "Trả lời tin nhắn được chuyển tiếp của người dùng để chặn anh ta sử dụng bot"
             )
 
     @app.on_message(
@@ -115,12 +115,12 @@ async def init():
     async def unblock_func(_, message: Message):
         if db is None:
             return await message.reply_text(
-                "MONGO_DB_URI var not defined. Please define it first"
+                "MONGO_DB_URI var không được xác định. Hãy xác định nó trước"
             )
         if message.reply_to_message:
             if not message.reply_to_message.forward_sender_name:
                 return await message.reply_text(
-                    "Please reply to forwarded messages only."
+                    "Vui lòng chỉ trả lời các tin nhắn được chuyển tiếp."
                 )
             replied_id = message.reply_to_message_id
             try:
@@ -128,25 +128,25 @@ async def init():
             except Exception as e:
                 print(e)
                 return await message.reply_text(
-                    "Failed to fetch user. You might've restarted bot or some error happened. Please check logs"
+                    "Không tìm nạp được người dùng.  Bạn có thể đã khởi động lại bot hoặc một số lỗi đã xảy ra. Vui lòng kiểm tra nhật ký"
                 )
             if not await mongo.is_banned_user(replied_user_id):
-                return await message.reply_text("Already UnBlocked")
+                return await message.reply_text("Đã được mở khóa")
             else:
                 await mongo.remove_banned_user(replied_user_id)
                 await message.reply_text(
-                    "Unblocked User from The Bot"
+                    "Người dùng được mở khóa!"
                 )
                 try:
                     await app.send_message(
                         replied_user_id,
-                        "You're now unbanned from the Bot by admins.",
+                        "Bạn hiện đã được bỏ cấm bởi quản trị viên.",
                     )
                 except:
                     pass
         else:
             return await message.reply_text(
-                "Reply to a user's forwarded message to unblock him from the bot"
+                "Trả lời tin nhắn được chuyển tiếp của người dùng để bỏ chặn anh ta khỏi bot"
             )
 
     @app.on_message(
@@ -155,17 +155,17 @@ async def init():
     async def stats_func(_, message: Message):
         if db is None:
             return await message.reply_text(
-                "MONGO_DB_URI var not defined. Please define it first"
+                "MONGO_DB_URI var không được xác định. Hãy xác định nó trước"
             )
         served_users = len(await mongo.get_served_users())
         blocked = await mongo.get_banned_count()
-        text = f""" **ChatBot Stats:**
+        text = f""" **Số liệu thống kê ChatBot:**
         
-**Python Version :** {pyver.split()[0]}
-**Pyrogram Version :** {pyrover}
+**Phiên bản Python:** {pyver.split()[0]}
+**Phiên bản Pyrogram:** {pyrover}
 
-**Served Users:** {served_users} 
-**Blocked Users:** {blocked}"""
+**Người dùng được phục vụ:** {served_users} 
+**Người dùng bị chặn:** {blocked}"""
         await message.reply_text(text)
 
     @app.on_message(
@@ -174,7 +174,7 @@ async def init():
     async def broadcast_func(_, message: Message):
         if db is None:
             return await message.reply_text(
-                "MONGO_DB_URI var not defined. Please define it first"
+                "MONGO_DB_URI var không được xác định. Hãy xác định nó trước"
             )
         if message.reply_to_message:
             x = message.reply_to_message.message_id
@@ -182,7 +182,7 @@ async def init():
         else:
             if len(message.command) < 2:
                 return await message.reply_text(
-                    "**Usage**:\n/broadcast [MESSAGE] or [Reply to a Message]"
+                    "**Sử dụng**:\n/broadcast [MESSAGE] hoặc [Reply to a Message]"
                 )
             query = message.text.split(None, 1)[1]
 
@@ -208,7 +208,7 @@ async def init():
                 pass
         try:
             await message.reply_text(
-                f"**Broadcasted Message to {susr} Users.**"
+                f"**Truyền tin nhắn tới {susr} người dùng.**"
             )
         except:
             pass
@@ -228,7 +228,7 @@ async def init():
                     return
                 if not message.reply_to_message.forward_sender_name:
                     return await message.reply_text(
-                        "Please reply to forwarded messages only."
+                        "Vui lòng chỉ trả lời các tin nhắn được chuyển tiếp."
                     )
                 replied_id = message.reply_to_message_id
                 try:
@@ -236,7 +236,7 @@ async def init():
                 except Exception as e:
                     print(e)
                     return await message.reply_text(
-                        "Failed to fetch user. You might've restarted bot or some error happened. Please check logs"
+                        "Không tìm nạp được người dùng.  Bạn có thể đã khởi động lại bot hoặc một số lỗi đã xảy ra. Vui lòng kiểm tra nhật ký"
                     )
                 try:
                     return await app.copy_message(
@@ -247,7 +247,7 @@ async def init():
                 except Exception as e:
                     print(e)
                     return await message.reply_text(
-                        "Failed to send the message, User might have blocked the bot or something wrong happened. Please check logs"
+                        "Không tìm nạp được người dùng.  Bạn có thể đã khởi động lại bot hoặc một số lỗi đã xảy ra. Vui lòng kiểm tra nhật ký"
                     )
         else:
             if await mongo.is_group():
@@ -285,14 +285,14 @@ async def init():
             replied_id = message.reply_to_message_id
             if not message.reply_to_message.forward_sender_name:
                 return await message.reply_text(
-                    "Please reply to forwarded messages only."
+                    "Vui lòng chỉ trả lời các tin nhắn được chuyển tiếp."
                 )
             try:
                 replied_user_id = save[replied_id]
             except Exception as e:
                 print(e)
                 return await message.reply_text(
-                    "Failed to fetch user. You might've restarted bot or some error happened. Please check logs"
+                    "Không tìm nạp được người dùng.  Bạn có thể đã khởi động lại bot hoặc một số lỗi đã xảy ra. Vui lòng kiểm tra nhật ký"
                 )
             try:
                 return await app.copy_message(
@@ -303,10 +303,10 @@ async def init():
             except Exception as e:
                 print(e)
                 return await message.reply_text(
-                    "Failed to send the message, User might have blocked the bot or something wrong happened. Please check logs"
+                    "Không gửi được tin nhắn, người dùng có thể đã chặn bot hoặc đã xảy ra sự cố. Vui lòng kiểm tra nhật ký"
                 )
 
-    print("[LOG] - Yukki Chat Bot Started")
+    print("[LOG] - Shagod Chat Bot Started")
     await idle()
 
 
