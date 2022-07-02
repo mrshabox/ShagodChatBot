@@ -15,7 +15,7 @@ import pyrogram
 from pyrogram import __version__ as pyrover
 from pyrogram import filters, idle
 from pyrogram.errors import FloodWait
-from pyrogram.types import Message
+from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 
 import config
 import mongo
@@ -43,7 +43,22 @@ async def init():
         if await mongo.is_banned_user(message.from_user.id):
             return
         await mongo.add_served_user(message.from_user.id)
-        await message.reply_text(config.PRIVATE_START_MESSAGE)
+        await message.reply_photo(
+        photo=f"https://telegra.ph/file/868d0d0340c862193a7e2.jpg",
+        caption=f"""👋 Xin chào {message.from_user.mention()} 
+
+Đây là bot CSKH của **MOMO68.CLUB**, mình có thể giúp gì cho bạn?""",
+    reply_markup=InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton(
+                    "➥ Nhấp vào đây để chơi game", url="https://momo86.club/"
+                    ),
+                ]
+            ]
+       ),
+    )
+    ))
 
     @app.on_message(
         filters.command("mode") & filters.user(SUDO_USERS)
