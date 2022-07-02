@@ -44,7 +44,7 @@ async def init():
             return
         await mongo.add_served_user(message.from_user.id)
         await message.reply_photo(
-        photo=f"https://telegra.ph/file/868d0d0340c862193a7e2.jpg",
+        photo="https://telegra.ph/file/868d0d0340c862193a7e2.jpg",
         caption=f"""👋 Xin chào {message.from_user.mention()} 
 
 Đây là bot CSKH của **MOMO68.CLUB**, mình có thể giúp gì cho bạn?""",
@@ -56,9 +56,7 @@ async def init():
                     ),
                 ]
             ]
-       ),
-    )
-    ))
+       ),)
 
     @app.on_message(
         filters.command("mode") & filters.user(SUDO_USERS)
